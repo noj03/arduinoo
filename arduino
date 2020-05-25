@@ -1,0 +1,172 @@
+//Pines de conexión del driver
+#include <Servo.h>
+
+Servo myservo;
+
+long duration, cm, inches;
+int pote,distancia,tiempo; 
+int speed; 
+int pinENA = 8;
+int pinENA1 = 9;
+SoftwareSerial BT(1,2);
+
+void setup() {
+  // inicializar la comunicación serial a 9600 bits por segundo:
+  Serial.begin(9600);
+  // configuramos los pines como salida
+  pinMode(pinENA, OUTPUT);
+  pinMode(pinENA1, OUTPUT);
+  BT.begin(9600);
+}
+
+
+
+void loop()
+{ // motor 1 aranca y gira ATRAS
+if(estadobt=='B'){
+   digitalWrite(pinENA, HIGH);
+   digitalWrite(pinIN1, HIGH);
+   digitalWrite(pinIN2, LOW);
+   
+   delay(1000);
+}
+  if(estadobt=='E'){
+  //motor 1 para
+  digitalWrite (pinENA, LOW);
+   delay(1000);
+  }
+  if(estadobt=='A'){
+  // motor 1 aranca y gira adelante
+   digitalWrite(pinENA, HIGH);
+   digitalWrite(pinIN2, HIGH);
+   digitalWrite(pinIN1, LOW);
+   delay(1000);
+  }
+  if(estadobt=='B'){
+  // motor 2 aranca y gira ATRAS
+   digitalWrite(pinENA1, HIGH);
+   digitalWrite(pinIN3, HIGH);
+   digitalWrite(pinIN4, LOW);
+   delay(1000);
+}
+  if(estadobt=='E'){
+  //motor 2 para
+  digitalWrite (pinENA, LOW);
+   delay(1000);
+}
+   if(estadobt=='A'){
+  // motor 2 aranca y gira adelante
+   digitalWrite(pinENA1, HIGH);
+   digitalWrite(pinIN4, HIGH);
+   digitalWrite(pinIN3, LOW);
+   delay(1000);
+}
+  
+  
+   myservo.write(0);  
+      delay(1000); 
+  
+  
+   myservo.write(45);  
+      delay(1000); 
+  
+  
+   
+   myservo.write(90);              
+      delay(1000);   
+  
+  myservo.write(180);              
+      delay(1000);   
+  
+ 
+    myservo.write(360);              
+      delay(500);   
+  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  pinMode(echoPin, INPUT);
+  duration = pulseIn(echoPin, HIGH);
+  
+  cm = (duration/2) / 29.1;
+  inches = (duration/2) / 74;
+  
+  Serial.print(inches);
+  Serial.print("in, ");
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+  
+  delay(250);
+  
+  digitalWrite(trigPin2,LOW);
+  delayMicroseconds(4);
+  
+  digitalWrite(trigPin2,HIGH);
+  delayMicroseconds(10);
+  
+  digitalWrite(trigPin2,LOW);
+  
+  tiempo = pulseIn(echoPin2,HIGH);
+  distancia = tiempo*343/10000/2 ;
+    
+  Serial.print(inches);
+  Serial.print("in, ");
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+  
+  delay(250);
+
+  // empezar modo automatico al darle al boton "on" en la aplicacion
+  if(estadobt=='G') {
+    
+  //detecta menos de 10 centimetros y anda  
+  if else (cm<10) {
+    digitalWrite(pinENA, LOW);
+    digitalWrite(pinENA1, LOW);
+    delay(250);
+  }
+  //si detecta una pared gira 45 grados
+  if else (cm<10) { 
+    myservo.write(45);  
+      delay(250); 
+  }
+  //si sigue detectando pared, gira 180 grados hasta que tenga camino libre
+  if else (cm<10) { 
+    myservo.write(180);  
+      delay(250); 
+  }
+  //cuando tiene camino libre (mas de 250cm) anda hacia delante
+    if else (cm>=250) {
+ // motor 1 aranca y gira adelante
+   digitalWrite(pinENA, HIGH);
+   digitalWrite(pinIN2, HIGH); //potencia
+   digitalWrite(pinIN1, LOW); //tierra
+   digitalWrite(pinENA1, HIGH);
+   digitalWrite(pinIN3, HIGH); //potencia
+   digitalWrite(pinIN4, LOW); //tierra
+    delay(1000);
+    }
+}
+}
+//si se le da al boton derecha en la aplicacion, un motor para de funcionar para que gire hacia ese lado
+if(estadobt=='C')
+{
+  digitalWrite (pinENA,LOW );
+  digitalWrite (pinENA1,HIGH );
+}
+//si se le da al boton izquierda en la aplicacion, un motor para de funcionar para que gire hacia ese lado
+if(estadobt=='D')
+{
+  digitalWrite (pinENA,HIGH);
+  digitalWrite (pinENA1,LOW);
+}
+//si se le da al boton parar en la aplicacion, los dos motores paran de funcionar para que se quede quieto
+if(estadobt=='F')
+{
+  digitalWrite (pinENA, LOW);
+  digitalWrite (pinENA, LOW);
+}
